@@ -1,0 +1,6 @@
+ilo.egg-info/PKG-INFO
+ilo.egg-info/SOURCES.txt
+ilo.egg-info/dependency_links.txt
+ilo.egg-info/entry_points.txt
+ilo.egg-info/requires.txt
+ilo.egg-info/top_level.txt
