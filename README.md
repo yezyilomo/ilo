@@ -11,25 +11,28 @@ Options:
 
 Commands:
 
-  create_db: This is a command for creating a database with argument as db
 
-             name to create
+create_db:
 
-  drop:      This is a command for droping a database table with argument as
+      This is a command for creating a database with argument as db name to create
 
-             table name for droping and option --all incase you want to drop
+drop:
+  
+      This is a command for droping a database table with argument as table name for 
+      
+      droping and option --all incase you want to drop all tables
 
-             all tables
+drop_db:
+  
+      This is a command for droping a database with argument as database name to drop
 
-  drop_db:   This is a command for droping a database with argument as
-
-             database name to drop
-
-  migrate:    This is a command for migrating database schema(defined as python
-
-             classes) with argument as class name from which a database table
-
-             is created and option --all incase you want to migrate all schema
+migrate:
+  
+      This is a command for migrating database schema(defined as python classes) with 
+      
+      argument as class name from which a database table is created and option --all 
+      
+      incase you want to migrate all schema
 
 
 # How to use it?
