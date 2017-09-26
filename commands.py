@@ -18,13 +18,14 @@ def migrate(args,flg):
    if len(args)==0 and flg=='all':
       try:
         run()
-        print('\033[1m'+'\033[93m'+ "All table created successfully"+'\033[0m')
+        print('\033[1m'+'\033[93m'+ "All tables created successfully"+'\033[0m')
       except Exception as e:
         print('\033[1m'+'\033[91m'+"there was a problem in creating database"+'\033[0m')
         if 'run' not in globals():
            print("Method 'run' is not defined in your 'raw_db' file ")
         else:
-           print(e)
+            print (e.args[1])
+
    else:
      for class_name in args:
        try:
@@ -35,7 +36,7 @@ def migrate(args,flg):
           if class_name not in globals():
              print("Class '"+class_name+"' is not defined in your 'raw_db' file")
           else:
-             print(e)
+             print (e.args[1])
 
 @click.command('drop', short_help='This is a command for droping a database table with argument as table name for droping and option --all incase you want to drop all tables')
 @click.option('--all', 'flg', flag_value='all')
@@ -44,23 +45,33 @@ def drop(tables,flg):
      if len(tables)==0 and flg != 'all':
        print('\033[1m'+'\033[91m'+"Specify table(s) to drop!."+'\033[0m')
        return
+
      if flg=='all':
         if len(db.db__tables__)==0:
           print('\033[1m'+'\033[91m'+"No table to drop!."+'\033[0m')
           return
-        db.db__tables__.reverse()
-        tables=db.db__tables__
+        for table in db.db__tables__:
+          try:
+            db.drop_tb_without_foreign_key_check(table)
+            print('\033[1m'+'\033[93m'+"'"+table+"' table dropped successfully"+'\033[0m')
+          except Exception as e:
+             print('\033[1m'+'\033[91m'+"failed to drop '"+table+"' table"+'\033[0m')
+             if table not in db.db__tables__:
+                print("'"+table+"' is not defined in your database")
+             else:
+                print (e.args[1])
+        return
 
      for table in tables:
        try:
-         db.drop(table)
+         db.drop_tb_with_foreign_key_check(table)
          print('\033[1m'+'\033[93m'+"'"+table+"' table dropped successfully"+'\033[0m')
        except Exception as e:
           print('\033[1m'+'\033[91m'+"failed to drop '"+table+"' table"+'\033[0m')
           if table not in db.db__tables__:
              print("'"+table+"' is not defined in your database")
           else:
-             print(e)
+             print (e.args[1])
 
 
 @click.command('create_db', short_help='This is a command for creating a database with argument as db name to create')
@@ -71,7 +82,7 @@ def create_db(db_name):
          print('\033[1m'+'\033[93m'+"'"+db_name+"' database created successfully"+'\033[0m')
        except Exception as e:
           print('\033[1m'+'\033[91m'+"failed to create '"+table+"' database"+'\033[0m')
-          print(e)
+          print (e.args[1])
 
 @click.command('drop_db', short_help='This is a command for droping a database with argument as database name to drop')
 @click.argument('db_name', nargs=-1)
@@ -82,7 +93,7 @@ def drop_db(db_name):
          print('\033[1m'+'\033[93m'+"'"+name+"' database dropped successfully"+'\033[0m')
        except Exception as e:
           print('\033[1m'+'\033[91m'+"failed to drop '"+name+"' database"+'\033[0m')
-          print(e)
+          print (e.args[1])
 
 cli.add_command(migrate)
 cli.add_command(drop)
