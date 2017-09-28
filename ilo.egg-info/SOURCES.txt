@@ -1,3 +1,5 @@
+commands.py
+setup.py
 ilo.egg-info/PKG-INFO
 ilo.egg-info/SOURCES.txt
 ilo.egg-info/dependency_links.txt
