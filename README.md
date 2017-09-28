@@ -33,14 +33,19 @@ migrate:
       argument as class name from which a database table is created and option --all 
       
       incase you want to migrate all schema
+      
+truncate:
+
+      This is a command for truncating a database table with argument as table name 
+      
+      to truncate and option --all incase you want to truncate all tables 
 
 
 # How to use it?
 
-$ git clone https://github.com/yezyilomo/ilo
+$ pip3 install ilo
 
-$ cd ilo
+But if you have dorm in your system, you don't need to install ilo, because dorm install
 
-$ pip install --editable .  or   pip3 install --editable  .
+it automatically
 
-Then you can start using it in your flask application

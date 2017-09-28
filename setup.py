@@ -1,9 +1,10 @@
 from setuptools import setup
+import commands
 
 setup(
     name='ilo',
-    version='0.1',
-    py_modules=['ex'],
+    version='1.0',
+    py_modules=['commands'],
     include_package_data=True,
     install_requires=[
         'click',
