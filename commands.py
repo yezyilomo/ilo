@@ -1,10 +1,13 @@
-import click, os, sys
+import sys
+import os
+import click
+from dorm import db
 sys.path.append(os.getcwd())
 try:
-  from raw_db import *
+  import raw_db
 except Exception as e:
     print('\033[1m'+'\033[91m'+"Your are not in the right directory!."+'\033[0m')
-    print("Please make sure you are in '.../database' directory and there is 'raw_db.py' in it.\n")
+    print("Please make sure you are in '.../database' directory and there is 'raw_db.py' and 'config.py' files in it.\n")
 
 
 @click.group()
@@ -17,23 +20,22 @@ def cli():
 def migrate(args,flg):
    if len(args)==0 and flg=='all':
       try:
-        run()
+        raw_db.run()
         print('\033[1m'+'\033[93m'+ "All tables created successfully"+'\033[0m')
       except Exception as e:
         print('\033[1m'+'\033[91m'+"there was a problem in creating database"+'\033[0m')
-        if 'run' not in globals():
+        if 'run' not in dir(raw_db):
            print("Method 'run' is not defined in your 'raw_db' file ")
         else:
             print (e.args[1])
-
    else:
      for class_name in args:
        try:
-         globals()[class_name]().create()
+         getattr(raw_db, class_name)().create()
          print('\033[1m'+'\033[93m'+"'"+class_name+"' table created successfully"+'\033[0m')
        except Exception as e:
           print('\033[1m'+'\033[91m'+"failed to create '"+class_name+"' table"+'\033[0m')
-          if class_name not in globals():
+          if class_name not in dir(raw_db):
              print("Class '"+class_name+"' is not defined in your 'raw_db' file")
           else:
              print (e.args[1])
@@ -72,7 +74,6 @@ def drop(tables,flg):
              print("'"+table+"' is not defined in your database")
           else:
              print (e.args[1])
-
 
 @click.command('create_db', short_help='This is a command for creating a database with argument as db name to create')
 @click.argument('db_name')
@@ -129,7 +130,6 @@ def truncate(tables,flg):
              print("'"+table+"' is not defined in your database")
           else:
              print (e.args[1])
-
 
 cli.add_command(migrate)
 cli.add_command(drop)

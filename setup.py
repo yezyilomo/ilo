@@ -3,7 +3,7 @@ import commands
 
 setup(
     name='ilo',
-    version='1.0',
+    version='1.1',
     py_modules=['commands'],
     include_package_data=True,
     install_requires=[
