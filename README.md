@@ -1,5 +1,6 @@
 # ilo
-  This is a command line tool for managing database eg creating
+  This is a command line tool for managing simple database operations, it comes with
+  several powerful commands for database manipulations
 
 # Available commands
 
