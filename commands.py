@@ -1,18 +1,23 @@
 import sys
 import os
 import click
-from dorm import db
 sys.path.append(os.getcwd())
 try:
   import raw_db
+  from raw_db import db
 except Exception as e:
     print('\033[1m'+'\033[91m'+"Your are not in the right directory!."+'\033[0m')
     print("Please make sure you are in '.../database' directory and there is 'raw_db.py' and 'config.py' files in it.\n")
 
-
 @click.group()
 def cli():
   pass
+
+@click.command('list', short_help='This is a command for listing tables in a given database')
+def list_all_tables():
+   tables=db.list_tables()
+   for table in tables:
+     print(table)
 
 @click.command('migrate', short_help='This is a command for migrating database schema(defined as python classes) with argument as class name from which a database table is created')
 @click.argument('args', nargs=-1)
@@ -31,8 +36,8 @@ def migrate(args,flg):
    else:
      for class_name in args:
        try:
-         getattr(raw_db, class_name)().create()
-         print('\033[1m'+'\033[93m'+"'"+class_name+"' table created successfully"+'\033[0m')
+          getattr(raw_db, class_name)().create()
+          print('\033[1m'+'\033[93m'+"'"+class_name+"' table created successfully"+'\033[0m')
        except Exception as e:
           print('\033[1m'+'\033[91m'+"failed to create '"+class_name+"' table"+'\033[0m')
           if class_name not in dir(raw_db):
@@ -52,16 +57,17 @@ def drop(tables,flg):
         if len(db.db__tables__)==0:
           print('\033[1m'+'\033[91m'+"No table to drop!."+'\033[0m')
           return
-        for table in db.db__tables__:
-          try:
-            db.drop_tb_without_foreign_key_check(table)
-            print('\033[1m'+'\033[93m'+"'"+table+"' table dropped successfully"+'\033[0m')
-          except Exception as e:
-             print('\033[1m'+'\033[91m'+"failed to drop '"+table+"' table"+'\033[0m')
-             if table not in db.db__tables__:
-                print("'"+table+"' is not defined in your database")
-             else:
-                print (e.args[1])
+        if click.confirm('Do you really want to drop all tables?'):
+            for table in db.db__tables__:
+              try:
+                db.drop_tb_without_foreign_key_check(table)
+                print('\033[1m'+'\033[93m'+"'"+table+"' table dropped successfully"+'\033[0m')
+              except Exception as e:
+                 print('\033[1m'+'\033[91m'+"failed to drop '"+table+"' table"+'\033[0m')
+                 if table not in db.db__tables__:
+                    print("'"+table+"' is not defined in your database")
+                 else:
+                    print (e.args[1])
         return
 
      for table in tables:
@@ -88,13 +94,14 @@ def create_db(db_name):
 @click.command('drop_db', short_help='This is a command for droping a database with argument as database name to drop')
 @click.argument('db_name', nargs=-1)
 def drop_db(db_name):
-     for name in db_name:
-       try:
-         db.drop_db(name)
-         print('\033[1m'+'\033[93m'+"'"+name+"' database dropped successfully"+'\033[0m')
-       except Exception as e:
-          print('\033[1m'+'\033[91m'+"failed to drop '"+name+"' database"+'\033[0m')
-          print (e.args[1])
+    if click.confirm("Do you really want to drop "+str(db_name)+" database(s)?"):
+       for name in db_name:
+         try:
+           db.drop_db(name)
+           print('\033[1m'+'\033[93m'+"'"+name+"' database dropped successfully"+'\033[0m')
+         except Exception as e:
+            print('\033[1m'+'\033[91m'+"failed to drop '"+name+"' database"+'\033[0m')
+            print (e.args[1])
 
 @click.command('truncate', short_help='This is a command for truncating a database table with argument as table name to truncate and option --all incase you want to truncate all tables')
 @click.option('--all', 'flg', flag_value='all')
@@ -108,16 +115,17 @@ def truncate(tables,flg):
         if len(db.db__tables__)==0:
           print('\033[1m'+'\033[91m'+"No table to truncate!."+'\033[0m')
           return
-        for table in db.db__tables__:
-          try:
-            db.truncate_tb_without_foreign_key_check(table)
-            print('\033[1m'+'\033[93m'+"'"+table+"' table truncated successfully"+'\033[0m')
-          except Exception as e:
-             print('\033[1m'+'\033[91m'+"failed to truncate '"+table+"' table"+'\033[0m')
-             if table not in db.db__tables__:
-                print("'"+table+"' is not defined in your database")
-             else:
-                print (e.args[1])
+        if click.confirm('Do you really want to truncate all tables?'):
+            for table in db.db__tables__:
+              try:
+                db.truncate_tb_without_foreign_key_check(table)
+                print('\033[1m'+'\033[93m'+"'"+table+"' table truncated successfully"+'\033[0m')
+              except Exception as e:
+                 print('\033[1m'+'\033[91m'+"failed to truncate '"+table+"' table"+'\033[0m')
+                 if table not in db.db__tables__:
+                    print("'"+table+"' is not defined in your database")
+                 else:
+                    print (e.args[1])
         return
 
      for table in tables:
@@ -131,6 +139,7 @@ def truncate(tables,flg):
           else:
              print (e.args[1])
 
+cli.add_command(list_all_tables)
 cli.add_command(migrate)
 cli.add_command(drop)
 cli.add_command(create_db)
